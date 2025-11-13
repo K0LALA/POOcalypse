@@ -1,6 +1,8 @@
-# Jeu basé sur le jeu de la vie de John Conway
+# POOcalypse
 
-Voilà, faudra faire des ajouts ici pour que nous mêmes sachions ce qu'on doit faire mdr, j'ai déjà commencé un document où j'ajoute mes idées mais voilà
+**POOCalypse** est un jeu 2D en vue de dessus dans lequel on incarne un personnage dont le but est de vaincre un méchant boss qui a fait du mal à son village.<br>
+Le thème est Steampunk et le personnage navigue dans un monde post-apocalyptique, détruit par le méchant boss POO.<br>
+En collectant des artefacts et de nouvelles technologies, il sera possible de vaincre des boss de plus en plus imposants, jusqu'à POO...
 
 ## Lancer
 

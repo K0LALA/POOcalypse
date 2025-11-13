@@ -28,7 +28,7 @@ JS
 
 Ressources visuelles :
 
-- `./tilesheets/` : Visuels pour la map
+- `./tilesets/` : Visuels pour la map
 - `./spritesheets/` : Visuels pour les personnages
 - `./gui/` : Visuels pour l’interface
 
