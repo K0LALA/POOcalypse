@@ -20,7 +20,6 @@ def main():
         exit(0)
         return
     
-    # TODO: Reattribuer le port a cette instance si pas bien ferme avant
     web_manager = web.main_web.start()
     
     # Gestionnaires inputs
@@ -29,6 +28,7 @@ def main():
     
     player = Player((50, 50))
     web.inputs.keyboard.add_event(player.move_input, "D", ["KeyW", "KeyA", "KeyS", "KeyD"])
+    web.inputs.mouse.add_event(player.move_random, "U", [player.id])
 
 def stop():
     """

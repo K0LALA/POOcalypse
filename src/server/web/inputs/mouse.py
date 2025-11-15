@@ -1,29 +1,43 @@
 class MEvent:
-    def __init__(self):
-        pass
+    """
+    Evenement souris
+    """
+    def __init__(self, state: str, ids: list, handler: callable):
+        self.state = state
+        self.ids = ids
+        self.handler = handler
     
-    def match(self):
-        pass
+    def match(self, state: str, button: list):
+        if state == self.state and button[0] in self.ids:
+            self.handler(button)
+            return True
+        return False
     
 events = []
 
-def add_event(handler: callable, state: str, buttons: list):
+def add_event(handler: callable, state: str, ids: list):
     """
     Ajoute un evenement
     
     Parametres:
+    
         - handler : Fonction a appeler en cas de declenchement
-        
-        - state :
-            - "D" lorsque le bouton est presse
-            - "U" lorsque le bouton est relache
-            
-        - buttons : Liste des boutons pour lesquels handler est appelé
+        - state : Une chaine de caractere donnant l'etat du bouton :
+            - "D" : Bouton appuye
+            - "U" : Bouton relache
+        - ids : Liste des IDs des objets lancant un appel        
     """
-    pass
+    event = MEvent(state, ids, handler)
+    events.append(event)
 
-def remove_event():
-    pass
+def remove_event(handler: callable, state: str, ids: list):
+    event = MEvent(state, ids, handler)
+    try:
+        events.remove(event)
+    except ValueError:
+        print("ValueError: Aucun evenement de la sorte n'existe!")
+        return False
+    return True
 
 def handle_input(state: str, button: list):
     """

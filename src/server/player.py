@@ -1,4 +1,5 @@
 from web.main_web import add_image, change_dimensions
+from random import randint
 
 IMG_PATH = "assets/spritesheets/square/square_001.png"
 MOVE_AMOUNT = 2
@@ -36,6 +37,10 @@ class Player:
                 self.move((0, MOVE_AMOUNT))
             case "KeyD":
                 self.move((MOVE_AMOUNT, 0))
+                
+    def move_random(self, button):
+        if button[1] == 0:
+            self.move((randint(-100, 100), randint(-100, 100)))
         
     def render(self):
         change_dimensions(self.id, (self.x, self.y))

@@ -54,7 +54,7 @@ def remove_event(handler: callable, state: str, keys: list):
     try:
         events.remove(event)    
     except ValueError:
-        print("ValueError: Aucun evenement de la sorte existe!")
+        print("ValueError: Aucun evenement de la sorte n'existe!")
         return False
     return True
 
