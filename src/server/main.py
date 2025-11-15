@@ -1,6 +1,8 @@
-import web.main_web
+from player import Player
+from web.main_web import *
 import web.inputs.keyboard
 import web.inputs.mouse
+import os
 
 web_manager = None
 
@@ -9,7 +11,15 @@ def main():
     Point d'entree du programme quand on lance le serveur
     """
     global web_manager
-    # TODO: Etablir un verrou pour pas lancer deux fois le serveur
+    
+    try:
+        lock = open("launched", "x")
+        lock.close()
+    except FileExistsError:
+        print("Une instance du serveur est deja lancee")
+        exit(0)
+        return
+    
     # TODO: Reattribuer le port a cette instance si pas bien ferme avant
     web_manager = web.main_web.start()
     
@@ -17,12 +27,17 @@ def main():
     web_manager.gestionnaire_clavier(web.inputs.keyboard.handle_input)
     web_manager.gestionnaire_souris(web.inputs.mouse.handle_input)
     
+    player = Player((50, 50))
+    web.inputs.keyboard.add_event(player.move_input, "D", ["KeyW", "KeyA", "KeyS", "KeyD"])
 
 def stop():
     """
     Fonction a appeler pour fermer **correctement** le serveur
     """
     web_manager.stop(fermer=False)
+    
+    os.remove("launched")
+    
     exit(0)
     
 # On verifie que le programme n'est pas importe mais bien lance
