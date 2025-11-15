@@ -1,3 +1,6 @@
+# Assets temporaires, non formattés
+/assets/*
+
 **/__pycache__/**
 
 .vscode/*
