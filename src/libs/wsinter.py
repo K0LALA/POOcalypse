@@ -28,7 +28,7 @@ class Inter:
 
         interface=Inter()
 
-        interface.demarre(page="page.html",clavier=False)
+        interface.demarre(page="page.html")
 
         interface.gestionnaire_souris(lambda m, d: m=="D" and interface.injecte('alert("Clic !")'))
 
@@ -155,7 +155,8 @@ function faire(o){
 
         Valeur renvoyée : None
 
-        Après le démarrage de l'interface, tous les appels javacript de transmission sont interceptés.
+        Après le démarrage de l'interface, tous les appels javacript de la fonction 
+        transmission, définie dans la page d'interface par ce module, sont interceptés.
         Lorsque l'on intercepte transmission(m,o) avec m=message, l'interface déclenchent un appel de
         handler(m,o)
         """
@@ -298,8 +299,8 @@ function faire(o){
         quand le serveur http reçoit une requête de la forme "localhost/req?param_1=va_l1&param_2=val_2&...",
         il appelle gen(req,d), où dictionnaire est le dictionnaire {param_k:val_k}
         
-        Cette fonction renvoie un tuple (extension, contenu), par exemple
-        ( "html", `"`"`"<!doctype html>\n<html lang="fr"><head><title>Réponse</title></head><body>Rien...</body></html>`"`"`")
+        Cette fonction renvoie un tuple (contenu,extension), par exemple
+        ( \"\"\"<!doctype html>\n<html lang="fr"><head><title>Réponse</title></head><body>Rien...</body></html>\"\"\", "html")
         
         Le contenu est envoyé à l'interface, comme réponse à la requête.
         
@@ -417,7 +418,7 @@ function faire(o){
                 return bytes('HTTP/1.1 404 Not Found\r\nContent-Type: text/plain; charset=utf-8\r\nConnection: close\r\nContent-Length:17\r\n\r\nPas trouvé !\r\n\r\n','utf-8')
             else:
                 if extension.lower() == "html" :
-                    contenu = contenu.replace(b'</head>',b'<script src="/js"></script></head>')
+                    contenu = contenu.replace(b'</head>',b'<script src="'+bytes(Inter._chemin_js,"utf-8")+b'"></script></head>')
                 return empaqueter(contenu, extension)
         
         # mise en place du socket «s» en écoute sur (ip, port)
@@ -445,7 +446,7 @@ function faire(o){
             t.settimeout(0.05)
 
             try:
-                req = t.recv(2048)
+                req = t.recv(4096)
             except socket.timeout:
                 pass
     #            print ('Timeout !')
@@ -477,6 +478,8 @@ function faire(o){
                         
                         non_binaire = typemime(ext)[1]
                         if non_binaire:
+                            if ext=="html":
+                                resp = resp.replace('</head>','<script src="'+Inter._chemin_js+'"></script></head>')
                             contenu = bytes(resp,'utf-8')
                         else:
                             contenu = resp
@@ -598,8 +601,10 @@ function faire(o){
                 self.liste_connect.append(t)
                 # on débloque demarre une fois la connexion WS établie
                 if self.ws_actif is None:
+                    self.ws_actif=t
                     self._verrou_ws.release()
-                self.ws_actif=t
+                else:
+                    self.ws_actif=t
         print("Arrêt du serveur ws")
 
     def _envoi(self, chaine:str):
@@ -642,9 +647,6 @@ function faire(o){
         if style != {}:
             self._push([{"id":id_objet,"data":{"style":style}}])        
 
-#    def contenu(self,elem,data):
-#        self._push([{"id":elem,"data":{"innerHTML":data}}])
-
     def insere(self, id_objet:str, balise: str,attr:dict={},style:dict={}):
         """
         Insère un élément sur la page, dans <body>
@@ -652,8 +654,8 @@ function faire(o){
         Paramètres:
           - id_objet: attribut id de l'objet créé
           - balise: balise de l'objet créé
-          - attr: dictionnaire attribut:valeur définissant les atributs de l'objet créé
-          - style: dictionnaire attrobut:valeur définissant les attributs de style de l'objet créé
+          - attr: dictionnaire attribut:valeur définissant les attributs de l'objet créé
+          - style: dictionnaire attribut:valeur définissant les attributs de style de l'objet créé
               
         Valeur renvoyée : None
         """
@@ -661,8 +663,7 @@ function faire(o){
         if attr != {}:
             self._push([{"id":id_objet,"data":attr}])
         if style != {}:
-            self._push([{"id":id_objet,"data":{"style":style}}])        
-
+            self._push([{"id":id_objet,"data":{"style":style}}])
 
     def injecte(self,code:str)->None:
         """
@@ -677,13 +678,16 @@ function faire(o){
             Si la page web contient un élément <input> dont l'attribut id vaut "PIN",
             on peut récupérer sa valeur dans le programme python comme suit:
             
-            # définir quoi faire de la valeur, ici l'afficher avec print
             interface.gestionnaire("recup_pin",lambda m,p: print(p))
-            # envoi du code javascript faisant envoyer la valeur par la page
             interface.injecte('transmettre("recup_pin",PIN.value)')          
+
+            La première ligne indique à l'interface qu'elle devra réagir à l'événement
+            «recup_pin» en affichant l'objet p reçu avec l'événement
+            
+            La seconde ligne déclenche dans le navigateur l'événement recup_pin accompagné
+            de l'attribut value de l'objet PIN de la page.
                 """
         self._push([{'id':'_new_script','tagName':'script','data':{'innerHTML':code}}])
-#        self._push([{"id":"_new_script","data":{"innerHTML":code}}])
 
     def _process(self,chaine:str):
         """
